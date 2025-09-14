@@ -3,7 +3,7 @@
   "name": "AI Tris Game",
   "version": "1.0.0",
   "description": "AI Color Tris is a 2D arcade game similar to other Tetris-like games, with AI player support",
-  "permissions": [],
+  "permissions": ["sidePanel"],
   "side_panel": {
     "default_path": "sidepanel.html"
   },
