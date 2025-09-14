@@ -1,3 +1,5 @@
+// Import unsafe-eval module first for Chrome extension compatibility
+import '@pixi/unsafe-eval';
 import * as PIXI from 'pixi.js';
 import { GameEngine } from './GameEngine';
 import { GameBoard } from './GameBoard';
