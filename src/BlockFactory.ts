@@ -28,14 +28,14 @@ export class BlockFactory {
     const colors = Object.values(Color);
     
     const blockType = types[Math.floor(Math.random() * types.length)];
-    const color = colors[Math.floor(Math.random() * colors.length)];
     
     const patterns = this.blockPatterns[blockType];
     const pattern = patterns[Math.floor(Math.random() * patterns.length)];
     
+    // Each box gets a random color
     const boxes: Box[] = pattern.positions.map(pos => ({
       position: { x: pos.x, y: pos.y },
-      color: color,
+      color: colors[Math.floor(Math.random() * colors.length)],
     }));
 
     return {

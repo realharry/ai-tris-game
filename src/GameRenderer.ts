@@ -113,27 +113,6 @@ export class GameRenderer {
         this.app.renderer.resize(this.canvasWidth, this.canvasHeight);
       }
     }
-    
-    const previewWidth = Math.min(availableRightSpace >= 70 ? availableRightSpace - 5 : this.canvasWidth - this.boardOffsetX, 75);
-    const previewHeight = 65;
-    
-    // Next block preview area background
-    const previewBg = new PIXI.Graphics();
-    previewBg.beginFill(0x333333);
-    previewBg.lineStyle(1, 0x555555);
-    previewBg.drawRect(this.previewX, this.previewY - 15, previewWidth, previewHeight);
-    previewBg.endFill();
-
-    const previewLabel = new PIXI.Text('Next:', {
-      fontFamily: 'Arial',
-      fontSize: 10,
-      fill: 0xffffff,
-    });
-    previewLabel.x = this.previewX + 2;
-    previewLabel.y = this.previewY - 12;
-
-    this.app.stage.addChild(previewBg);
-    this.app.stage.addChild(previewLabel);
   }
 
   public render(): void {
@@ -207,6 +186,30 @@ export class GameRenderer {
     const nextBlock = this.gameEngine.getNextBlock();
     if (!nextBlock) return;
 
+    // Calculate preview area dimensions and position
+    const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
+    const availableRightSpace = this.canvasWidth - (this.boardOffsetX + boardWidth + 10);
+    const previewWidth = Math.min(availableRightSpace >= 70 ? availableRightSpace - 5 : this.canvasWidth - this.boardOffsetX, 75);
+    const previewHeight = 65;
+    
+    // Draw preview area background
+    const previewBg = new PIXI.Graphics();
+    previewBg.beginFill(0x333333);
+    previewBg.lineStyle(1, 0x555555);
+    previewBg.drawRect(this.previewX, this.previewY - 15, previewWidth, previewHeight);
+    previewBg.endFill();
+    this.nextBlockContainer.addChild(previewBg);
+
+    // Draw "Next:" label
+    const previewLabel = new PIXI.Text('Next:', {
+      fontFamily: 'Arial',
+      fontSize: 10,
+      fill: 0xffffff,
+    });
+    previewLabel.x = this.previewX + 2;
+    previewLabel.y = this.previewY - 12;
+    this.nextBlockContainer.addChild(previewLabel);
+
     // Use larger preview cell size for better visibility
     const previewCellSize = Math.max(Math.min(this.cellSize * 0.7, 15), 8);
 
@@ -219,9 +222,9 @@ export class GameRenderer {
     const blockWidth = (maxX - minX + 1) * previewCellSize;
     const blockHeight = (maxY - minY + 1) * previewCellSize;
     
-    // Center the block within the 70px wide preview area
-    const previewAreaWidth = 70;
-    const previewAreaHeight = 50;
+    // Center the block within the preview area
+    const previewAreaWidth = previewWidth - 10; // Account for padding
+    const previewAreaHeight = previewHeight - 20; // Account for label and padding
     const offsetX = Math.max(5, (previewAreaWidth - blockWidth) / 2);
     const offsetY = Math.max(5, (previewAreaHeight - blockHeight) / 2);
 
