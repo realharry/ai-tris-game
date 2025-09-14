@@ -11,6 +11,8 @@ export class GameEngine {
   private stats: GameStats = { score: 0, level: 1, linesCleared: 0 };
   private dropTimer: number = 0;
   private dropInterval: number = 1000; // milliseconds
+  private aiMoveTimer: number = 0;
+  private aiMoveInterval: number = 200; // AI makes moves every 200ms for consistent tempo
 
   constructor() {
     this.board = new GameBoard();
@@ -41,6 +43,7 @@ export class GameEngine {
     this.nextBlock = BlockFactory.createRandomBlock();
     this.dropTimer = 0;
     this.dropInterval = 1000;
+    this.aiMoveTimer = 0;
   }
 
   public update(deltaTime: number): void {
@@ -54,13 +57,22 @@ export class GameEngine {
     }
 
     if (this.gameMode === GameMode.AI && this.currentBlock) {
-      this.updateAI();
+      this.aiMoveTimer += deltaTime;
+      if (this.aiMoveTimer >= this.aiMoveInterval) {
+        this.aiMoveTimer = 0;
+        this.updateAI();
+      }
     }
   }
 
   private spawnNewBlock(): void {
     this.currentBlock = this.nextBlock;
     this.nextBlock = BlockFactory.createRandomBlock();
+
+    // Reset AI timer when a new block spawns for consistent timing
+    if (this.gameMode === GameMode.AI) {
+      this.aiMoveTimer = 0;
+    }
 
     if (!this.board.isValidPosition(this.currentBlock, this.currentBlock.position)) {
       this.gameState = GameState.GAME_OVER;
@@ -153,19 +165,25 @@ export class GameEngine {
     const bestMove = this.findBestMove();
     
     if (bestMove) {
-      // Move towards the best position
-      if (this.currentBlock.position.x < bestMove.x) {
-        this.moveBlock('right');
-      } else if (this.currentBlock.position.x > bestMove.x) {
-        this.moveBlock('left');
-      }
+      // Make one move per update for consistent tempo
+      // Priority: rotation first, then horizontal movement, then drop
       
-      // Rotate if needed
+      // First, handle rotation if needed
       if (this.currentBlock.rotation !== bestMove.rotation) {
         this.rotateBlock();
+        return; // Only do one action per AI update
       }
       
-      // Drop if in position
+      // Then handle horizontal movement
+      if (this.currentBlock.position.x < bestMove.x) {
+        this.moveBlock('right');
+        return;
+      } else if (this.currentBlock.position.x > bestMove.x) {
+        this.moveBlock('left');
+        return;
+      }
+      
+      // Finally, drop if in correct position and rotation
       if (this.currentBlock.position.x === bestMove.x && 
           this.currentBlock.rotation === bestMove.rotation) {
         this.dropBlock();
