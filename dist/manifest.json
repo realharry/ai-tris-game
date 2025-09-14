@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "AI Tris Game",
+  "version": "1.0.0",
+  "description": "AI Color Tris is a 2D arcade game similar to other Tetris-like games, with AI player support",
+  "permissions": [],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "Open AI Tris Game"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

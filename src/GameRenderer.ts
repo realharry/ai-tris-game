@@ -9,16 +9,32 @@ export class GameRenderer {
   private boardContainer: PIXI.Container;
   private currentBlockContainer: PIXI.Container;
   private nextBlockContainer: PIXI.Container;
-  private cellSize: number = 30;
-  private boardOffsetX: number = 50;
-  private boardOffsetY: number = 50;
+  private cellSize: number;
+  private boardOffsetX: number;
+  private boardOffsetY: number;
+  private canvasWidth: number;
+  private canvasHeight: number;
 
   constructor(gameEngine: GameEngine, parentElement: HTMLElement) {
     this.gameEngine = gameEngine;
     
+    // Calculate responsive dimensions
+    const containerWidth = parentElement.clientWidth || 300;
+    this.canvasWidth = Math.min(containerWidth - 20, 300); // Max 300px width for side panel
+    this.canvasHeight = Math.min(this.canvasWidth * 1.4, 500); // Maintain aspect ratio
+    
+    // Calculate cell size to fit the board
+    const availableBoardWidth = this.canvasWidth - 60; // Leave space for preview
+    this.cellSize = Math.floor(availableBoardWidth / GameBoard.BOARD_WIDTH);
+    this.cellSize = Math.max(this.cellSize, 15); // Minimum cell size
+    this.cellSize = Math.min(this.cellSize, 25); // Maximum cell size for side panel
+    
+    this.boardOffsetX = 10;
+    this.boardOffsetY = 10;
+    
     this.app = new PIXI.Application({
-      width: 600,
-      height: 700,
+      width: this.canvasWidth,
+      height: this.canvasHeight,
       backgroundColor: 0x222222,
     });
 
@@ -69,19 +85,26 @@ export class GameRenderer {
   }
 
   private setupNextBlockPreview(): void {
+    // Calculate preview position - place it to the right of the board or below if narrow
+    const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
+    const previewX = this.boardOffsetX + boardWidth + 10;
+    const previewY = this.boardOffsetY;
+    const previewWidth = this.canvasWidth - previewX - 5;
+    const previewHeight = 60;
+    
     // Next block preview area
     const previewBg = new PIXI.Graphics();
     previewBg.beginFill(0x333333);
-    previewBg.drawRect(350, 50, 120, 80);
+    previewBg.drawRect(previewX, previewY, Math.max(previewWidth, 60), previewHeight);
     previewBg.endFill();
 
-    const previewLabel = new PIXI.Text('Next Block:', {
+    const previewLabel = new PIXI.Text('Next:', {
       fontFamily: 'Arial',
-      fontSize: 16,
+      fontSize: 12,
       fill: 0xffffff,
     });
-    previewLabel.x = 355;
-    previewLabel.y = 30;
+    previewLabel.x = previewX + 2;
+    previewLabel.y = previewY - 15;
 
     this.app.stage.addChild(previewBg);
     this.app.stage.addChild(previewLabel);
@@ -154,9 +177,11 @@ export class GameRenderer {
     const nextBlock = this.gameEngine.getNextBlock();
     if (!nextBlock) return;
 
-    const previewX = 380;
-    const previewY = 80;
-    const previewCellSize = 20;
+    // Calculate preview position
+    const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
+    const previewX = this.boardOffsetX + boardWidth + 15;
+    const previewY = this.boardOffsetY + 20;
+    const previewCellSize = Math.min(this.cellSize * 0.6, 15);
 
     for (const box of nextBlock.boxes) {
       const cell = this.createCell(box.color, previewCellSize);
@@ -192,7 +217,7 @@ export class GameRenderer {
 
     const gameOverText = new PIXI.Text('GAME OVER', {
       fontFamily: 'Arial',
-      fontSize: 36,
+      fontSize: Math.min(this.canvasWidth / 8, 24),
       fill: 0xff4444,
       align: 'center',
     });
@@ -201,16 +226,16 @@ export class GameRenderer {
     gameOverText.x = this.app.screen.width / 2;
     gameOverText.y = this.app.screen.height / 2;
 
-    const restartText = new PIXI.Text('Press R to restart', {
+    const restartText = new PIXI.Text('Press Reset to restart', {
       fontFamily: 'Arial',
-      fontSize: 18,
+      fontSize: Math.min(this.canvasWidth / 16, 12),
       fill: 0xffffff,
       align: 'center',
     });
     
     restartText.anchor.set(0.5);
     restartText.x = this.app.screen.width / 2;
-    restartText.y = this.app.screen.height / 2 + 50;
+    restartText.y = this.app.screen.height / 2 + 30;
 
     this.app.stage.addChild(overlay);
     this.app.stage.addChild(gameOverText);

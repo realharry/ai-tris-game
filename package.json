@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && vite build",
+    "build:extension": "npm run build && cp public/sidepanel.html dist/ && cp public/manifest.json dist/ && cp public/background.js dist/ && cp public/*.png dist/",
     "dev": "vite",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts",

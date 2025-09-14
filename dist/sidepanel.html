@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tris Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            width: 100%;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            text-align: center;
+        }
+        #controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            width: 100%;
+            max-width: 280px;
+        }
+        button {
+            padding: 8px 12px;
+            font-size: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 280px;
+            font-size: 14px;
+            text-align: center;
+        }
+        #game-info > div {
+            flex: 1;
+        }
+        #game-canvas {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        #instructions {
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.3;
+            margin-top: 10px;
+            padding: 0 5px;
+        }
+        #instructions p {
+            margin: 5px 0;
+        }
+        
+        /* Ensure the game fits in side panel width */
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>AI Tris Game</h1>
+        <div id="controls">
+            <button id="start-human">Start Human</button>
+            <button id="start-ai">Start AI</button>
+            <button id="pause">Pause</button>
+            <button id="reset">Reset</button>
+        </div>
+        <div id="game-info">
+            <div>Score: <span id="score">0</span></div>
+            <div>Level: <span id="level">1</span></div>
+            <div>Lines: <span id="lines">0</span></div>
+        </div>
+        <div id="game-canvas"></div>
+        <div id="instructions">
+            <p>Arrow keys: move/rotate</p>
+            <p>Space: drop</p>
+            <p>Same color clears rows!</p>
+        </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
