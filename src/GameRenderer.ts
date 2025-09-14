@@ -11,6 +11,7 @@ export class GameRenderer {
   private boardContainer: PIXI.Container;
   private currentBlockContainer: PIXI.Container;
   private nextBlockContainer: PIXI.Container;
+  private gameOverContainer: PIXI.Container;
   private cellSize: number;
   private boardOffsetX: number;
   private boardOffsetY: number;
@@ -49,10 +50,12 @@ export class GameRenderer {
     this.boardContainer = new PIXI.Container();
     this.currentBlockContainer = new PIXI.Container();
     this.nextBlockContainer = new PIXI.Container();
+    this.gameOverContainer = new PIXI.Container();
 
     this.app.stage.addChild(this.boardContainer);
     this.app.stage.addChild(this.currentBlockContainer);
     this.app.stage.addChild(this.nextBlockContainer);
+    this.app.stage.addChild(this.gameOverContainer);
 
     this.setupBoard();
     this.setupNextBlockPreview();
@@ -93,9 +96,25 @@ export class GameRenderer {
   private setupNextBlockPreview(): void {
     // Calculate preview position - place it to the right of the board or below if narrow
     const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
-    const previewX = this.boardOffsetX + boardWidth + 10;
-    const previewY = this.boardOffsetY;
-    const previewWidth = this.canvasWidth - previewX - 5;
+    const availableRightSpace = this.canvasWidth - (this.boardOffsetX + boardWidth + 10);
+    
+    let previewX, previewY;
+    
+    // If there's enough space to the right, place it there, otherwise below the board
+    if (availableRightSpace >= 60) {
+      previewX = this.boardOffsetX + boardWidth + 10;
+      previewY = this.boardOffsetY;
+    } else {
+      previewX = this.boardOffsetX;
+      previewY = this.boardOffsetY + GameBoard.BOARD_HEIGHT * this.cellSize + 10;
+      // Extend canvas height if needed for below-board preview
+      if (previewY + 70 > this.canvasHeight) {
+        this.canvasHeight = previewY + 70;
+        this.app.renderer.resize(this.canvasWidth, this.canvasHeight);
+      }
+    }
+    
+    const previewWidth = Math.min(availableRightSpace >= 60 ? availableRightSpace : this.canvasWidth - this.boardOffsetX, 80);
     const previewHeight = 60;
     
     // Next block preview area
@@ -106,11 +125,11 @@ export class GameRenderer {
 
     const previewLabel = new PIXI.Text('Next:', {
       fontFamily: 'Arial',
-      fontSize: 12,
+      fontSize: 10,
       fill: 0xffffff,
     });
     previewLabel.x = previewX + 2;
-    previewLabel.y = previewY - 15;
+    previewLabel.y = previewY - 13;
 
     this.app.stage.addChild(previewBg);
     this.app.stage.addChild(previewLabel);
@@ -143,6 +162,10 @@ export class GameRenderer {
     
     while (this.nextBlockContainer.children.length > 0) {
       this.nextBlockContainer.removeChildAt(0);
+    }
+
+    while (this.gameOverContainer.children.length > 0) {
+      this.gameOverContainer.removeChildAt(0);
     }
 
     // Clear board tiles (keep background and grid)
@@ -183,11 +206,22 @@ export class GameRenderer {
     const nextBlock = this.gameEngine.getNextBlock();
     if (!nextBlock) return;
 
-    // Calculate preview position
+    // Calculate preview position using same logic as setup
     const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
-    const previewX = this.boardOffsetX + boardWidth + 15;
-    const previewY = this.boardOffsetY + 20;
-    const previewCellSize = Math.min(this.cellSize * 0.6, 15);
+    const availableRightSpace = this.canvasWidth - (this.boardOffsetX + boardWidth + 10);
+    
+    let previewX, previewY;
+    
+    // If there's enough space to the right, place it there, otherwise below the board
+    if (availableRightSpace >= 60) {
+      previewX = this.boardOffsetX + boardWidth + 15;
+      previewY = this.boardOffsetY + 20;
+    } else {
+      previewX = this.boardOffsetX + 5;
+      previewY = this.boardOffsetY + GameBoard.BOARD_HEIGHT * this.cellSize + 25;
+    }
+    
+    const previewCellSize = Math.min(this.cellSize * 0.6, 12);
 
     for (const box of nextBlock.boxes) {
       const cell = this.createCell(box.color, previewCellSize);
@@ -243,9 +277,9 @@ export class GameRenderer {
     restartText.x = this.app.screen.width / 2;
     restartText.y = this.app.screen.height / 2 + 30;
 
-    this.app.stage.addChild(overlay);
-    this.app.stage.addChild(gameOverText);
-    this.app.stage.addChild(restartText);
+    this.gameOverContainer.addChild(overlay);
+    this.gameOverContainer.addChild(gameOverText);
+    this.gameOverContainer.addChild(restartText);
   }
 
   public destroy(): void {
