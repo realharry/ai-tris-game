@@ -17,19 +17,21 @@ export class GameRenderer {
   private boardOffsetY: number;
   private canvasWidth: number;
   private canvasHeight: number;
+  private previewX: number = 0;
+  private previewY: number = 0;
 
   constructor(gameEngine: GameEngine, parentElement: HTMLElement) {
     this.gameEngine = gameEngine;
     
     // Calculate responsive dimensions
     const containerWidth = parentElement.clientWidth || 300;
-    this.canvasWidth = Math.min(containerWidth - 20, 300); // Max 300px width for side panel
+    this.canvasWidth = Math.min(containerWidth - 20, 320); // Increased max width to accommodate preview
     
     // Calculate cell size to fit the board
-    const availableBoardWidth = this.canvasWidth - 60; // Leave space for preview
+    const availableBoardWidth = this.canvasWidth - 80; // Leave more space for preview (80px instead of 60px)
     this.cellSize = Math.floor(availableBoardWidth / GameBoard.BOARD_WIDTH);
-    this.cellSize = Math.max(this.cellSize, 15); // Minimum cell size
-    this.cellSize = Math.min(this.cellSize, 25); // Maximum cell size for side panel
+    this.cellSize = Math.max(this.cellSize, 12); // Reduced minimum cell size slightly
+    this.cellSize = Math.min(this.cellSize, 22); // Reduced maximum cell size to make room for preview
     
     // Calculate required height to fit the full board plus padding
     const requiredBoardHeight = GameBoard.BOARD_HEIGHT * this.cellSize;
@@ -98,29 +100,28 @@ export class GameRenderer {
     const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
     const availableRightSpace = this.canvasWidth - (this.boardOffsetX + boardWidth + 10);
     
-    let previewX, previewY;
-    
-    // If there's enough space to the right, place it there, otherwise below the board
-    if (availableRightSpace >= 60) {
-      previewX = this.boardOffsetX + boardWidth + 10;
-      previewY = this.boardOffsetY;
+    // Store preview position for consistent use in renderNextBlock
+    if (availableRightSpace >= 70) { // Increased minimum space requirement
+      this.previewX = this.boardOffsetX + boardWidth + 8;
+      this.previewY = this.boardOffsetY + 15; // Offset for the label
     } else {
-      previewX = this.boardOffsetX;
-      previewY = this.boardOffsetY + GameBoard.BOARD_HEIGHT * this.cellSize + 10;
+      this.previewX = this.boardOffsetX;
+      this.previewY = this.boardOffsetY + GameBoard.BOARD_HEIGHT * this.cellSize + 25; // Offset for the label
       // Extend canvas height if needed for below-board preview
-      if (previewY + 70 > this.canvasHeight) {
-        this.canvasHeight = previewY + 70;
+      if (this.previewY + 60 > this.canvasHeight) {
+        this.canvasHeight = this.previewY + 60;
         this.app.renderer.resize(this.canvasWidth, this.canvasHeight);
       }
     }
     
-    const previewWidth = Math.min(availableRightSpace >= 60 ? availableRightSpace : this.canvasWidth - this.boardOffsetX, 80);
-    const previewHeight = 60;
+    const previewWidth = Math.min(availableRightSpace >= 70 ? availableRightSpace - 5 : this.canvasWidth - this.boardOffsetX, 75);
+    const previewHeight = 65;
     
-    // Next block preview area
+    // Next block preview area background
     const previewBg = new PIXI.Graphics();
     previewBg.beginFill(0x333333);
-    previewBg.drawRect(previewX, previewY, Math.max(previewWidth, 60), previewHeight);
+    previewBg.lineStyle(1, 0x555555);
+    previewBg.drawRect(this.previewX, this.previewY - 15, previewWidth, previewHeight);
     previewBg.endFill();
 
     const previewLabel = new PIXI.Text('Next:', {
@@ -128,8 +129,8 @@ export class GameRenderer {
       fontSize: 10,
       fill: 0xffffff,
     });
-    previewLabel.x = previewX + 2;
-    previewLabel.y = previewY - 13;
+    previewLabel.x = this.previewX + 2;
+    previewLabel.y = this.previewY - 12;
 
     this.app.stage.addChild(previewBg);
     this.app.stage.addChild(previewLabel);
@@ -206,27 +207,31 @@ export class GameRenderer {
     const nextBlock = this.gameEngine.getNextBlock();
     if (!nextBlock) return;
 
-    // Calculate preview position using same logic as setup
-    const boardWidth = GameBoard.BOARD_WIDTH * this.cellSize;
-    const availableRightSpace = this.canvasWidth - (this.boardOffsetX + boardWidth + 10);
+    // Use larger preview cell size for better visibility
+    const previewCellSize = Math.max(Math.min(this.cellSize * 0.7, 15), 8);
+
+    // Find the bounds of the block to center it properly
+    const minX = Math.min(...nextBlock.boxes.map(box => box.position.x));
+    const maxX = Math.max(...nextBlock.boxes.map(box => box.position.x));
+    const minY = Math.min(...nextBlock.boxes.map(box => box.position.y));
+    const maxY = Math.max(...nextBlock.boxes.map(box => box.position.y));
     
-    let previewX, previewY;
+    const blockWidth = (maxX - minX + 1) * previewCellSize;
+    const blockHeight = (maxY - minY + 1) * previewCellSize;
     
-    // If there's enough space to the right, place it there, otherwise below the board
-    if (availableRightSpace >= 60) {
-      previewX = this.boardOffsetX + boardWidth + 15;
-      previewY = this.boardOffsetY + 20;
-    } else {
-      previewX = this.boardOffsetX + 5;
-      previewY = this.boardOffsetY + GameBoard.BOARD_HEIGHT * this.cellSize + 25;
-    }
-    
-    const previewCellSize = Math.min(this.cellSize * 0.6, 12);
+    // Center the block within the 70px wide preview area
+    const previewAreaWidth = 70;
+    const previewAreaHeight = 50;
+    const offsetX = Math.max(5, (previewAreaWidth - blockWidth) / 2);
+    const offsetY = Math.max(5, (previewAreaHeight - blockHeight) / 2);
 
     for (const box of nextBlock.boxes) {
       const cell = this.createCell(box.color, previewCellSize);
-      cell.x = previewX + box.position.x * previewCellSize;
-      cell.y = previewY + box.position.y * previewCellSize;
+      // Adjust for block's minimum coordinates to properly center
+      const finalX = this.previewX + offsetX + (box.position.x - minX) * previewCellSize;
+      const finalY = this.previewY + offsetY + (box.position.y - minY) * previewCellSize;
+      cell.x = finalX;
+      cell.y = finalY;
       this.nextBlockContainer.addChild(cell);
     }
   }
