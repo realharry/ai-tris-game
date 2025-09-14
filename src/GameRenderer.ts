@@ -23,13 +23,17 @@ export class GameRenderer {
     // Calculate responsive dimensions
     const containerWidth = parentElement.clientWidth || 300;
     this.canvasWidth = Math.min(containerWidth - 20, 300); // Max 300px width for side panel
-    this.canvasHeight = Math.min(this.canvasWidth * 1.4, 500); // Maintain aspect ratio
     
     // Calculate cell size to fit the board
     const availableBoardWidth = this.canvasWidth - 60; // Leave space for preview
     this.cellSize = Math.floor(availableBoardWidth / GameBoard.BOARD_WIDTH);
     this.cellSize = Math.max(this.cellSize, 15); // Minimum cell size
     this.cellSize = Math.min(this.cellSize, 25); // Maximum cell size for side panel
+    
+    // Calculate required height to fit the full board plus padding
+    const requiredBoardHeight = GameBoard.BOARD_HEIGHT * this.cellSize;
+    const requiredCanvasHeight = requiredBoardHeight + 40; // Add padding for UI elements
+    this.canvasHeight = Math.min(Math.max(requiredCanvasHeight, this.canvasWidth * 1.4), 600);
     
     this.boardOffsetX = 10;
     this.boardOffsetY = 10;

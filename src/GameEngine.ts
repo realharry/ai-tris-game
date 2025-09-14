@@ -38,6 +38,9 @@ export class GameEngine {
     this.currentBlock = null;
     this.board.clear();
     this.stats = { score: 0, level: 1, linesCleared: 0 };
+    this.nextBlock = BlockFactory.createRandomBlock();
+    this.dropTimer = 0;
+    this.dropInterval = 1000;
   }
 
   public update(deltaTime: number): void {

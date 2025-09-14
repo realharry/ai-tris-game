@@ -69,11 +69,12 @@ export class InputHandler {
     const gameState = this.gameEngine.getGameState();
     const isPlaying = gameState === GameState.PLAYING;
     const isPaused = gameState === GameState.PAUSED;
+    const isGameOver = gameState === GameState.GAME_OVER;
 
     if (startHumanBtn) startHumanBtn.disabled = isPlaying;
     if (startAIBtn) startAIBtn.disabled = isPlaying;
     if (pauseBtn) {
-      pauseBtn.disabled = gameState === GameState.IDLE || gameState === GameState.GAME_OVER;
+      pauseBtn.disabled = gameState === GameState.IDLE || isGameOver;
       pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
     }
     if (resetBtn) resetBtn.disabled = false;

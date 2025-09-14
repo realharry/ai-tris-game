@@ -6,24 +6,24 @@ export class BlockFactory {
   // Define the 14 different block patterns (6 straight + 8 bent, each with red/blue colors)
   private static blockPatterns = {
     [BlockType.STRAIGHT]: [
-      // Straight blocks: 3 boxes in a line (6 variations including rotations)
+      // Straight blocks: 3 boxes in a connected line (6 variations)
       { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }] }, // Horizontal
       { positions: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }] }, // Vertical
-      { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 2, y: 1 }] }, // Horizontal with offset
-      { positions: [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 2 }] }, // Vertical with offset
-      { positions: [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 0 }] }, // Diagonal-like
-      { positions: [{ x: 1, y: 1 }, { x: 0, y: 0 }, { x: 0, y: 2 }] }, // Another diagonal-like
+      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }] }, // Diagonal down-right
+      { positions: [{ x: 2, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 2 }] }, // Diagonal down-left
+      { positions: [{ x: 0, y: 2 }, { x: 1, y: 1 }, { x: 2, y: 0 }] }, // Diagonal up-right
+      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 2 }] }, // Vertical with middle offset
     ],
     [BlockType.BENT]: [
-      // L-shaped blocks: bent configurations (8 variations)
+      // L-shaped blocks: bent configurations (8 variations) - all connected
       { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }] }, // L shape
       { positions: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] }, // Reverse L
-      { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }] }, // Another L
-      { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] }, // T-like
-      { positions: [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }] }, // Mirror L
-      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 1 }] }, // Wide L
-      { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 2, y: 1 }] }, // Wide reverse L
-      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 2 }] }, // Tall L
+      { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }] }, // Mirrored L
+      { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] }, // Another L variant
+      { positions: [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }] }, // L rotated
+      { positions: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }] }, // L backwards
+      { positions: [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }] }, // L upside down
+      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 0 }] }, // L final variant
     ],
   };
 
