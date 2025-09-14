@@ -33,9 +33,9 @@ describe('BlockFactory', () => {
   });
 
   describe('getAllBlockVariants', () => {
-    it('should return 12 different block variants', () => {
+    it('should return 28 different block variants', () => {
       const variants = BlockFactory.getAllBlockVariants();
-      expect(variants).toHaveLength(12); // 6 straight + 6 bent (2 colors each)
+      expect(variants).toHaveLength(28); // 14 types (6 straight + 8 bent) × 2 colors each
     });
 
     it('should include both block types', () => {

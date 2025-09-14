@@ -3,19 +3,27 @@ import { Block, BlockType, Box, Color } from './types';
 export class BlockFactory {
   private static blockId = 0;
 
-  // Define the 12 different block patterns (6 straight + 6 bent, each with red/blue colors)
+  // Define the 14 different block patterns (6 straight + 8 bent, each with red/blue colors)
   private static blockPatterns = {
     [BlockType.STRAIGHT]: [
-      // Straight blocks: 3 boxes in a line
+      // Straight blocks: 3 boxes in a line (6 variations including rotations)
       { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }] }, // Horizontal
       { positions: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }] }, // Vertical
+      { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 2, y: 1 }] }, // Horizontal with offset
+      { positions: [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 2 }] }, // Vertical with offset
+      { positions: [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 0 }] }, // Diagonal-like
+      { positions: [{ x: 1, y: 1 }, { x: 0, y: 0 }, { x: 0, y: 2 }] }, // Another diagonal-like
     ],
     [BlockType.BENT]: [
-      // L-shaped blocks: bent configurations
+      // L-shaped blocks: bent configurations (8 variations)
       { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }] }, // L shape
       { positions: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] }, // Reverse L
       { positions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }] }, // Another L
       { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] }, // T-like
+      { positions: [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }] }, // Mirror L
+      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 1 }] }, // Wide L
+      { positions: [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 2, y: 1 }] }, // Wide reverse L
+      { positions: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 2 }] }, // Tall L
     ],
   };
 
