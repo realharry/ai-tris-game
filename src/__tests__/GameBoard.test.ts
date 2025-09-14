@@ -119,8 +119,8 @@ describe('GameBoard', () => {
       }
     });
 
-    it('should not clear a row with mixed colors', () => {
-      // Fill bottom row with mixed colors
+    it('should not clear a row with mixed colors when no color has 6+ boxes', () => {
+      // Fill bottom row with mixed colors (4 red, 4 blue)
       for (let x = 0; x < GameBoard.BOARD_WIDTH; x++) {
         const color = x % 2 === 0 ? Color.RED : Color.BLUE;
         board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, color);
@@ -130,14 +130,53 @@ describe('GameBoard', () => {
       expect(clearedRows).toBe(0);
     });
 
-    it('should not clear a partially filled row', () => {
-      // Partially fill bottom row with red blocks
+    it('should clear a partially filled row when one color has 6+ boxes', () => {
+      // Partially fill bottom row with red blocks (7 red, 1 empty)
       for (let x = 0; x < GameBoard.BOARD_WIDTH - 1; x++) {
         board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, Color.RED);
       }
       
       const clearedRows = board.clearCompletedRows();
+      expect(clearedRows).toBe(1);
+    });
+
+    it('should clear a row with exactly 6 boxes of same color', () => {
+      // Fill bottom row with 6 red, 2 blue
+      for (let x = 0; x < 6; x++) {
+        board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, Color.RED);
+      }
+      for (let x = 6; x < 8; x++) {
+        board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, Color.BLUE);
+      }
+      
+      const clearedRows = board.clearCompletedRows();
+      expect(clearedRows).toBe(1);
+    });
+
+    it('should not clear a row with 5 boxes of same color', () => {
+      // Fill bottom row with 5 red, 3 blue
+      for (let x = 0; x < 5; x++) {
+        board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, Color.RED);
+      }
+      for (let x = 5; x < 8; x++) {
+        board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, Color.BLUE);
+      }
+      
+      const clearedRows = board.clearCompletedRows();
       expect(clearedRows).toBe(0);
+    });
+
+    it('should clear a row with mixed colors and gaps when one color has 6+ boxes', () => {
+      // Create pattern: R R R B R R R _ (6 red, 1 blue, 1 empty)
+      const pattern = [Color.RED, Color.RED, Color.RED, Color.BLUE, Color.RED, Color.RED, Color.RED, null];
+      for (let x = 0; x < GameBoard.BOARD_WIDTH; x++) {
+        if (pattern[x] !== null) {
+          board.setCellColor(x, GameBoard.BOARD_HEIGHT - 1, pattern[x]);
+        }
+      }
+      
+      const clearedRows = board.clearCompletedRows();
+      expect(clearedRows).toBe(1);
     });
   });
 

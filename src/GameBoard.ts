@@ -82,14 +82,17 @@ export class GameBoard {
   private isRowComplete(y: number): boolean {
     const row = this.grid[y];
     
-    // Check if row is fully filled
-    if (row.some(cell => cell === null)) {
-      return false;
+    // Count occurrences of each color (excluding nulls)
+    const colorCounts: { [key in Color]?: number } = {};
+    
+    for (const cell of row) {
+      if (cell !== null) {
+        colorCounts[cell] = (colorCounts[cell] || 0) + 1;
+      }
     }
     
-    // Check if all cells have the same color
-    const firstColor = row[0];
-    return row.every(cell => cell === firstColor);
+    // Check if any color appears 6 or more times in the row
+    return Object.values(colorCounts).some(count => count >= 6);
   }
 
   public isGameOver(): boolean {
